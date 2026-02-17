@@ -1,30 +1,72 @@
-import pandas as pd
-import numpy as np
+"""
+This module implements the bisection method for root finding.
+"""
+import csv
 
-def fixed_point_iteration_with_error(g, p0, tol=1e-4, max_iter=100):
-    iterations = []
-    p_prev = p0
-    # For n=0, error is not defined relative to a previous step
-    iterations.append({'$n$': 0, '$p$': p_prev, 'Error |$p_n$ - $p_{n-1}$|': None})
+def bisection_method(func, a, b, tolerance, max_iter=100):
+    """
+    Implements the Bisection Method to find a root of a function.
     
-    for n in range(1, max_iter + 1):
-        p_curr = g(p_prev)
-        error = abs(p_curr - p_prev)
-        iterations.append({'n': n, 'p': p_curr, 'error': error})
+    Args:
+        func: The function for which to find the root.
+        a: The lower bound of the interval [a, b].
+        b: The upper bound of the interval [a, b].
+        tolerance: The error tolerance. The method stops when (b - a) / 2 < tolerance.
+        max_iter: The maximum number of iterations.
         
-        if error < tol:
+    Returns:
+        None (writes to CSV file)
+    """
+    # Check if a root is bracketed
+    if func(a) * func(b) >= 0:
+        print("Bisection method fails. f(a) and f(b) must have opposite signs.")
+        return
+    iterations = []
+    # Header for CSV
+    header = ["$n$", "$a_n$", "$b_n$", "$p_n$", "$f(p_n)$", "Error"]
+    an = a
+    bn = b
+    for n in range(1, max_iter + 1):
+        # Midpoint
+        pn = (an + bn) / 2
+        fpn = func(pn)
+        # Error bound
+        error = (bn - an) / 2
+        # Store iteration data
+        # n, a_n, b_n, p_n, f(p_n), Error
+        iterations.append([n, an, bn, pn, fpn, error])
+        # Check convergence
+        if error < tolerance or fpn == 0:
+            print(f"Converged to root: {pn} after {n} iterations.")
             break
-        p_prev = p_curr
-    
-    return pd.DataFrame(iterations)
+        # Determine new interval
+        if func(an) * fpn < 0:
+            bn = pn
+        else:
+            an = pn
+    else:
+        print("Maximum iterations reached without convergence.")
+    # Write to CSV
+    with open('bisection_results.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(header)
+        writer.writerows(iterations)
+    print("Results written to bisection_results.csv")
 
-# Define g(p) = cos(p)
-def g(p):
-    return np.cos(p)
-p0 = 0.5
-tol = 1e-4
+if __name__ == "__main__":
+    # Example usage: Find root of f(x) = x^3 + 4x^2 - 10 = 0 in [1, 2]
+    # Adjust this function and interval as needed
+    def f(x):
+        """
+        The function to find the root of.
 
-df_with_error = fixed_point_iteration_with_error(g, p0, tol)
-df_with_error.to_csv('fixed_point_iterations_with_error.csv', index=False)
-
-print(df_with_error)
+        Args:
+            x: The value to evaluate.
+        
+        Returns: The value of the function at x.
+        """
+        return x**3 - 3 * x**2 + 2 * x - 0.1
+    A_INITIAL = 0.0
+    B_INITIAL = 2.0
+    TOL = 1e-6
+    bisection_method(f, A_INITIAL, B_INITIAL, TOL)
