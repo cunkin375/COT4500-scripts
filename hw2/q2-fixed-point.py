@@ -5,7 +5,7 @@ def fixed_point_iteration_with_error(g, p0, tol=1e-4, max_iter=100):
     iterations = []
     p_prev = p0
     # For n=0, error is not defined relative to a previous step
-    iterations.append({'n': 0, 'p': p_prev, 'error': None})
+    iterations.append({'$n$': 0, '$p$': p_prev, 'Error |$p_n$ - $p_{n-1}$|': None})
     
     for n in range(1, max_iter + 1):
         p_curr = g(p_prev)
@@ -19,7 +19,8 @@ def fixed_point_iteration_with_error(g, p0, tol=1e-4, max_iter=100):
     return pd.DataFrame(iterations)
 
 # Define g(p) = cos(p)
-g = lambda p: np.cos(p)
+def g(p):
+    return np.cos(p)
 p0 = 0.5
 tol = 1e-4
 
