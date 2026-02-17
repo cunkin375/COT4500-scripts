@@ -54,8 +54,6 @@ def bisection_method(func, a, b, tolerance, max_iter=100):
     print("Results written to bisection_results.csv")
 
 if __name__ == "__main__":
-    # Example usage: Find root of f(x) = x^3 + 4x^2 - 10 = 0 in [1, 2]
-    # Adjust this function and interval as needed
     def f(x):
         """
         The function to find the root of.
